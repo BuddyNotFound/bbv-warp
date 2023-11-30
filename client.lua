@@ -2,15 +2,18 @@ Main = {
     ped = PlayerPedId
 }
 
-function Main:Warp(coords)
+function Main:Warp(coords,heading)
     if IsPedInAnyVehicle(self.ped()) then 
         self.veh = GetVehiclePedIsIn(PlayerPedId())
         self.WarpPos = coords
+        self.heading = heading
         self.Cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", 1)
         RenderScriptCams(true, 1, 1500,  true,  true)
         self:processCamera(self.Cam)
     else
-        SetEntityCoords(self:ped(),coords)
+        self.WarpPos = coords
+        self.Cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", 1)
+        self:processCamera(self.Cam)
     end
 end
 
@@ -31,6 +34,7 @@ function Main:processCamera(cam)
 
     Wait(1500)
     SetPedCoordsKeepVehicle(PlayerPedId(), self.WarpPos)
+    SetEntityHeading(PlayerPedId(), self.heading)
 	local vehpos = GetEntityCoords(self.veh)
 	local vehfront = GetEntityForwardVector(self.veh)
 	local vehfrontpos = vector3(vehpos.x - (vehfront.x * 3),vehpos.y - (vehfront.y * 3) ,vehpos.z - (vehfront.z * 2) )
@@ -55,7 +59,7 @@ CreateThread(function()
                 DrawMarker(2, Config.Warps[k].Enter.x, Config.Warps[k].Enter.y, Config.Warps[k].Enter.z , 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 0.1, 0.1, 0.1, 255, 255, 255, 255, false, true, 2, nil, nil, false)
                 Draw3DText(Config.Warps[k].Enter.x, Config.Warps[k].Enter.y, Config.Warps[k].Enter.z + 0.2, 0.2, '[E] - Warp')
                 if IsControlJustReleased(1, 38) then
-                    Main:Warp(Config.Warps[k].Exit)
+                    Main:Warp(Config.Warps[k].Exit ,Config.Warps[k].HeadingExit)
                 end
             end
         end
